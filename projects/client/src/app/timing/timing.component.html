@@ -1,0 +1,29 @@
+<div class="relative">
+  <ngx-kit-button
+      [ngClass]="toggleBtnSelectors$ | async"
+      (clickFunc)="toggleTiming()">
+    <img src="assets/alarm.svg" alt="">
+  </ngx-kit-button>
+  <div
+      class="
+        absolute right-2 top-16 bg-c30-bg p-4
+        flex flex-col w-96 z-10"
+      *ngIf="isEnabled">
+
+    <!-- Groups selector -->
+    <div
+        class="flex flex-row justify-start items-center gap-2">
+      <ngx-kit-button
+          [ngClass]="kvp.key.sid === selectedGroupSid ? [] : UNSELECTED_GROUP_SELECTOR_CLASSES"
+          *ngFor="let kvp of groupToTimers | keyvalue"
+          (clickFunc)="selectGroup(kvp.key)">
+        {{ kvp.key.name }}
+      </ngx-kit-button>
+      <ngx-kit-button
+        [extraCssClasses]="['bg-c10-bg', 'h-6', 'w-4', 'hover:bg-c10-bg-active']"
+        (clickFunc)="createGroup()">
+        +
+      </ngx-kit-button>
+    </div>
+  </div>
+</div>

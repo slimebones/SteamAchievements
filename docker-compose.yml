@@ -1,0 +1,35 @@
+version: "3"
+services:
+  server:
+    build:
+      context: .
+      dockerfile: server.dockerfile
+    container_name: server
+    depends_on:
+      - mongo
+    volumes:
+      - ./var/docker/server:/solution/projects/server/var
+    restart: unless-stopped
+    ports:
+      - 9161:9161
+
+  client:
+    build:
+      context: .
+      dockerfile: client.dockerfile
+    container_name: client
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - 9160:80
+
+  mongo:
+    image: mongo
+    container_name: focus-mongo
+    restart: unless-stopped
+    volumes:
+      - ./var/docker/mongo:/data/db
+    ports:
+      - 9162:27017
+

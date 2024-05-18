@@ -1,0 +1,78 @@
+<div
+    class="
+      w-full p-4 h-full flex flex-col justify-start items-start
+      overflow-y-scroll gap-y-8 mb-12"
+    *ngIf="(projectSv.currentProject$ | async) !== null; else choose_project">
+  <div class="font-bold self-center mb-4">
+    Tasks
+  </div>
+
+  <form
+      class="flex flex-row gap-4 justify-center items-center w-full mb-4"
+      [formGroup]="createForm"
+      (ngSubmit)="onCreateSubmit($event)">
+    <ngx-kit-mat-input
+        #task_create_inp
+        class="text-black w-full"
+        [type]="InputType.Text"
+        (keydown.enter)="onKeydownEnter($event)"
+        formControlName="text" />
+    <ngx-kit-button
+        type="submit"
+        [extraCssClasses]="[
+          'bg-c10-bg', 'text-c10-fg', 'hover:bg-c10-bg-active',
+          'hover:text-c10-fg-active', 'rounded', 'h-8'
+        ]">
+      +
+    </ngx-kit-button>
+  </form>
+
+  <div
+      class="
+        flex flex-row justify-center items-center gap-x-4"
+      *ngFor="let task of tasks">
+    <ngx-kit-button (clickFunc)="complete(task.sid)">
+      <img class="h-6 filter-white" src="assets/circle-outline.svg" alt="0">
+    </ngx-kit-button>
+    <span
+        class="text-2xl">
+      {{task.text}}
+    </span>
+    <ngx-kit-button
+        [extraCssClasses]="['bg-gray-500', 'hover:bg-gray-400', 'h-8', 'p-1']"
+        (clickFunc)="del(task)">
+      X
+    </ngx-kit-button>
+  </div>
+
+  <ngx-kit-hr class="w-full mt-8 mb-8" />
+
+  <div
+      class="
+        flex flex-row justify-center items-center gap-x-4 opacity-50"
+      *ngFor="let task of completedTasks">
+    <span
+        class="text-2xl">
+      {{task.text}}
+    </span>
+    <ngx-kit-button
+        [extraCssClasses]="['bg-gray-500', 'hover:bg-gray-400', 'h-8', 'p-1']"
+        (clickFunc)="redo(task.sid)">
+      <img class="h-4 filter-white" src="assets/undo_arrow.svg" alt="0">
+    </ngx-kit-button>
+    <ngx-kit-button
+        [extraCssClasses]="['bg-gray-500', 'hover:bg-gray-400', 'h-8', 'p-1']"
+        (clickFunc)="del(task)">
+      X
+    </ngx-kit-button>
+  </div>
+</div>
+
+<ng-template #choose_project>
+  <div
+      class="
+        flex justify-center items-center w-full h-full p-4 text-3xl opacity-50
+      ">
+    Please select a project
+  </div>
+</ng-template>

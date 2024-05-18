@@ -1,0 +1,42 @@
+<div
+    class="
+      flex flex-col justify-start items-center
+      w-full h-screen bg-c60-bg text-c60-fg text-xl relative">
+  <div
+      class="
+        flex flex-row justify-center items-center w-full bg-c30-bg
+        text-c30-fg text-2xl p-2 gap-8 relative">
+    <div
+        *ngFor="let view of views">
+      <ngx-kit-button
+          [ngClass]="view.cssSelectors"
+          (clickFunc)="selectView(view)">
+        {{view.title}}
+      </ngx-kit-button>
+    </div>
+
+    <!-- Timing -->
+    <app-timing class="absolute right-2 w-14"></app-timing>
+  </div>
+
+  <ng-container
+      *ngIf="openedViewType$ | async as openedViewType">
+    <div
+        class="
+          w-full h-full
+          overflow-x-hidden overflow-y-hidden
+          flex flex-row
+          justify-start gap-4"
+        *ngIf="openedViewType === AppView.TPI">
+      <app-projects/>
+      <app-tasks class="grow"/>
+    </div>
+
+    <div
+        class="w-full h-full"
+        *ngIf="openedViewType === AppView.Domains">
+      <app-domain-manager/>
+    </div>
+  </ng-container>
+</div>
+
