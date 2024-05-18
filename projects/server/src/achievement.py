@@ -13,30 +13,35 @@ from orwynn.mongo import (
 )
 from orwynn.rbac import OkEvt
 
-from src.color import ColorPalette
 
-
-class FocusDomainUdto(Udto):
+class AchievementUdto(Udto):
+    key: str
     name: str
-    color_palette: ColorPalette
-    timer_sids: list[str] = []
+    icon_url: str | None
+    rarity: float
+    completion_timestamp: float | None
 
-class FocusDomainDoc(Doc):
-    FIELDS = [DocField(name="name", unique=True)]
+class AchievementDoc(Doc):
+    COLLECTION_NAMING = "snake_case"
+
+    key: str
     name: str
-    color_palette: ColorPalette
-    timer_sids: list[str] = []
+    icon_url: str
+    rarity: float
+    completion_timestamp: float | None
 
-    def to_udto(self) -> FocusDomainUdto:
-        return FocusDomainUdto(
-                sid=self.sid,
-                name=self.name,
-                timer_sids=self.timer_sids,
-                color_palette=self.color_palette)
+    def to_udto(self) -> AchievementUdto:
+        return AchievementUdto(
+            sid=self.sid,
+            key=self.key,
+            name=self.name,
+            icon_url=self.icon_url,
+            rarity=self.rarity,
+            completion_timestamp=self.completion_timestamp)
 
 class FocusDomainSys(Sys):
     CommonSubMsgFilters = [
-        filter_collection_factory(FocusDomainDoc.get_collection())
+        filter_collection_factory(AchievementDoc.get_collection())
     ]
 
     async def enable(self):
@@ -48,19 +53,19 @@ class FocusDomainSys(Sys):
         await self._sub(DelDocReq, self._on_del_doc)
 
     async def _on_get_docs(self, req: GetDocsReq):
-        docs = list(FocusDomainDoc.get_many(req.searchQuery))
-        await self._pub(FocusDomainDoc.to_got_doc_udtos_evt(req, docs))
+        docs = list(AchievementDoc.get_many(req.searchQuery))
+        await self._pub(AchievementDoc.to_got_doc_udtos_evt(req, docs))
 
     async def _on_create_doc(self, req: CreateDocReq):
-        doc = FocusDomainDoc(**req.createQuery).create()
+        doc = AchievementDoc(**req.createQuery).create()
         await self._pub(doc.to_got_doc_udto_evt(req))
 
     async def _on_upd_doc(self, req: UpdDocReq):
-        doc = FocusDomainDoc.get_and_upd(req.searchQuery, req.updQuery)
+        doc = AchievementDoc.get_and_upd(req.searchQuery, req.updQuery)
         await self._pub(doc.to_got_doc_udto_evt(req))
 
     async def _on_del_doc(self, req: DelDocReq):
-        doc = FocusDomainDoc.get(req.searchQuery)
+        doc = AchievementDoc.get(req.searchQuery)
         doc.delete()
         await self._pub(OkEvt(rsid="").as_res_from_req(req))
 
