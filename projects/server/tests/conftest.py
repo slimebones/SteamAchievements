@@ -44,16 +44,3 @@ async def client(app: App, aiohttp_client):
 async def server_bus(app) -> ServerBus:
     return ServerBus.ie()
 
-@pytest_asyncio.fixture
-async def timer_udto_1(server_bus: ServerBus) -> TimerUdto:
-    evt = await server_bus.pubr(CreateDocReq(
-        collection="timerDoc",
-        createQuery=Query(
-            purpose="work",
-            totalDuration=2.0
-        )
-    ))
-    evt = check.instance(evt, GotDocUdtoEvt)
-    udto = check.instance(evt.udto, TimerUdto)
-    return udto
-
