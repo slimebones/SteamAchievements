@@ -3,14 +3,10 @@ import os
 import pytest_asyncio
 from orwynn.app import App
 from orwynn.boot import Boot
-from orwynn.mongo import CreateDocReq, GotDocUdtoEvt, MongoUtils
+from orwynn.mongo import MongoUtils
 from orwynn.tst import Client
-from pykit.check import check
 from pykit.fcode import FcodeCore
-from pykit.query import Query
 from rxcat import ServerBus
-
-from src.timing import TimerUdto
 
 
 @pytest_asyncio.fixture(autouse=True)

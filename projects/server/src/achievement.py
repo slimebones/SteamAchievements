@@ -4,7 +4,6 @@ from orwynn.mongo import (
     CreateDocReq,
     DelDocReq,
     Doc,
-    DocField,
     GetDocsReq,
     Sys,
     Udto,

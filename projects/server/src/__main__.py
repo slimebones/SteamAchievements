@@ -2,8 +2,9 @@ import asyncio
 
 from orwynn.boot import Boot
 
-from src.game import *
 from src.achievement import *
+from src.game import *
+
 
 async def main():
     await Boot.run_cli()
