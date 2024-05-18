@@ -4,6 +4,7 @@ from orwynn.boot import Boot
 
 from src.achievement import *
 from src.game import *
+from src.user import *
 
 
 async def main():
