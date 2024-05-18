@@ -1,4 +1,3 @@
-
 from orwynn.mongo import (
     CreateDocReq,
     DelDocReq,
