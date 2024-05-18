@@ -11,19 +11,19 @@ module.exports = {
       // fg => foreground
       // bg => background
       colors: {
-        "c60-bg": "#070F2B",
-        "c60-fg": "#FFFFFF",
+        "c60-bg": "#222831",
+        "c60-fg": "#EEEEEE",
 
-        "c30-bg": "#1B1A55",
-        "c30-fg": "#FFFFFF",
+        "c30-bg": "#31363F",
+        "c30-fg": "#EEEEEE",
 
-        "c10-fg": "#FFFFFF",
-        "c10-bg": "#535C91",
+        "c10-fg": "#76ABAE",
+        "c10-bg": "#EEEEEE",
 
-        "c10-bg-active": "#9290C3",
+        "c10-bg-active": "#7fabad",
         "c10-fg-active": "#FFFFFF",
 
-        "c-fg-disabled": "#FFFFFF",
+        "c-fg-disabled": "#EEEEEE",
         "c-bg-disabled": colors.gray["300"]
       },
       animation: {
