@@ -19,6 +19,7 @@ class GameUdto(Udto):
     platform: str
     icon_url: str | None
     achievement_sids: list[str]
+    playtime: float
 
 class GameDoc(Doc):
     COLLECTION_NAMING = "snake_case"
@@ -34,19 +35,21 @@ class GameDoc(Doc):
     """
     platform: str
     name: str
-    completion: float
+    completion: float = 0.0
     """
     Calculated on-possibility. Signifies percent of completed achievements, to
     all achievements.
     """
     achievement_sids: list[str] = []
     icon_url: str | None = None
+    playtime: float = 0.0
 
     def to_udto(self) -> GameUdto:
         return GameUdto(
             sid=self.sid,
             key=self.key,
             name=self.name,
+            playtime=self.playtime,
             platform=self.platform,
             completion=self.completion,
             icon_url=self.icon_url,

@@ -1,7 +1,12 @@
 import httpx
 from typing import TYPE_CHECKING
+from orwynn.mongo import Query
 
 from pydantic import BaseModel
+from pykit.log import log
+from src.achievement import AchievementDoc
+
+from src.game import GameDoc
 
 if TYPE_CHECKING:
     from src.user import UserDoc
@@ -22,19 +27,62 @@ class SteamUrls:
 class SteamPlatformProcessor(PlatformProcessor):
     async def process(self, args: PlatformProcessorArgs):
         async with httpx.AsyncClient() as client:
-            res = client.get(SteamUrls.GET_OWNED_GAMES.format(
+            res = await client.get(SteamUrls.GET_OWNED_GAMES.format(
                 steam_id=args.platform_user_sid,
                 api_token=args.api_token))
-    # res = httpx.request("get", url)
+            if res.status_code >= 400:
+                log.err(
+                    "err occured during http req to get owned games:"
+                    + f" {res.text}"
+                    " => abort processing of steam platform")
+                return
+            data = res.json()
+            for rawgame in data["response"]["games"]:
+                platform = "steam"
+                key = str(rawgame["appid"])
+                playtime = float(rawgame["playtime_forever"])
+                # name will be fetched later during achievements request
+                name = ""
 
-    # if res.status_code >= 400:
-    #     print(res.text)
-    #     exit(1)
+                game, is_created = GameDoc(
+                    platform=platform,
+                    key=key,
+                    playtime=playtime,
+                    name=name
+                ).get_or_create(Query({
+                    "platform": platform,
+                    "key": key
+                }))
+                if not is_created:
+                    game = game.upd(Query.as_upd(
+                        set={"playtime": playtime, "name": name}
+                    ))
+                achievements_res = await self._try_create_or_upd_achievements(
+                    game, args)
+                if not achievements_res:
+                    return
+                game, achievments = achievements_res
 
-    # data = res.json()
-    # pprint(data)
-    # with open("out.json", "w") as f:
-    #     json.dump(data, f)
+    async def _try_create_or_upd_achievements(
+        self,
+        game: GameDoc,
+        args: PlatformProcessorArgs
+    ) -> tuple[GameDoc, list[AchievementDoc]] | None:
+        async with httpx.AsyncClient() as client:
+            res = await client.get(SteamUrls.GET_PLAYER_ACHIEVEMENTS.format(
+                steam_id=args.platform_user_sid,
+                api_token=args.api_token,
+                app_id=game.key))
+            if res.status_code >= 400:
+                log.err(
+                    f"err occured during http req to get achievements for game"
+                    + f"{game.key}: {res.text}"
+                    " => abort further processing of steam platform")
+                return None
+            data = res.json()["playerstats"]
+
+            game = game.upd(Query.as_upd(set={"name": data["gameName"]}))
+
 
 PLATFORM_TO_PROCESSOR: dict[str, PlatformProcessor] = {
     "steam": SteamPlatformProcessor()
