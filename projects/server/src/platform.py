@@ -14,9 +14,8 @@ class SteamUrls:
 
 class SteamPlatformProcessor(PlatformProcessor):
     async def process(self, user: "UserDoc", api_token: str):
-        pass
-        # async with httpx.AsyncClient() as client:
-        #     res = client.get(url)
+        async with httpx.AsyncClient() as client:
+            res = client.get(SteamUrls.GET_OWNED_GAMES.format())
     # res = httpx.request("get", url)
 
     # if res.status_code >= 400:
