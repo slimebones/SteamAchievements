@@ -61,7 +61,7 @@ class SteamPlatformProcessor(PlatformProcessor):
                     game, args)
                 if not achievements_res:
                     return
-                game, achievments = achievements_res
+                game, achievements = achievements_res
 
     async def _try_create_or_upd_achievements(
         self,
@@ -83,6 +83,7 @@ class SteamPlatformProcessor(PlatformProcessor):
 
             # upd game name since it appear only on achievements gathering
             game = game.upd(Query.as_upd(set={"name": data["gameName"]}))
+            achievements = []
             for raw_achievement in data["achievements"]:
                 key = raw_achievement["apiname"]
                 # todo: find out friendly name, icon url from
@@ -106,7 +107,17 @@ class SteamPlatformProcessor(PlatformProcessor):
                         achievement.sid in game.achievement_sids, \
                         f"already created achievement {achievement.key}" \
                                 f"should be part of game {game.key}"
-                    achievement = achievement.upd(Query.as_upd(set={"name": name})
+                    achievement = achievement.upd(Query.as_upd(set={
+                        "name": name,
+                        "completion_time": completion_time
+                    }))
+
+                game = game.upd(Query.as_upd(push={
+                    "achievement_sids": achievement.sid
+                }))
+                achievements.append(achievement)
+
+            return game, achievements
 
 PLATFORM_TO_PROCESSOR: dict[str, PlatformProcessor] = {
     "steam": SteamPlatformProcessor()
