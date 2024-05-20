@@ -17,7 +17,7 @@ class AchievementUdto(Udto):
     key: str
     name: str
     icon_url: str | None
-    rarity: float
+    rarity: float | None
     completion_timestamp: float | None
 
 class AchievementDoc(Doc):
@@ -25,9 +25,9 @@ class AchievementDoc(Doc):
 
     key: str
     name: str
-    icon_url: str
-    rarity: float
-    completion_timestamp: float | None
+    rarity: float | None = None
+    icon_url: str | None = None
+    completion_timestamp: float | None = None
 
     def to_udto(self) -> AchievementUdto:
         return AchievementUdto(

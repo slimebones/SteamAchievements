@@ -81,8 +81,32 @@ class SteamPlatformProcessor(PlatformProcessor):
                 return None
             data = res.json()["playerstats"]
 
+            # upd game name since it appear only on achievements gathering
             game = game.upd(Query.as_upd(set={"name": data["gameName"]}))
+            for raw_achievement in data["achievements"]:
+                key = raw_achievement["apiname"]
+                # todo: find out friendly name, icon url from
+                #       external sources, and rarity from steam info
+                #       (global achievements API)
+                name = key
+                is_achieved = raw_achievement["achieved"] == 1
+                completion_time = float(raw_achievement["unlocktime"])
+                if not is_achieved:
+                    completion_time = None
+                achievement, is_created = AchievementDoc(
+                        key=key,
+                        name=name,
+                        completion_time=completion_time) \
+                    .get_or_create(Query({
+                        "key": key
+                    }))
 
+                if not is_created:
+                    assert \
+                        achievement.sid in game.achievement_sids, \
+                        f"already created achievement {achievement.key}" \
+                                f"should be part of game {game.key}"
+                    achievement = achievement.upd(Query.as_upd(set={"name": name})
 
 PLATFORM_TO_PROCESSOR: dict[str, PlatformProcessor] = {
     "steam": SteamPlatformProcessor()
