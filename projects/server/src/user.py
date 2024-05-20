@@ -5,7 +5,7 @@ from pykit.query import Query
 from rxcat import Req
 from pykit.fcode import code
 
-from src.platform import PLATFORM_TO_PROCESSOR, PLATFORMS
+from src.platform import PLATFORM_TO_PROCESSOR, PLATFORMS, PlatformProcessorArgs
 
 class UserUdto(Udto):
     username: str
@@ -75,7 +75,15 @@ class UserSys(Sys):
                 continue
             if platform not in PLATFORMS:
                 raise ValueErr(f"unrecognized platform {platform}")
-            await PLATFORM_TO_PROCESSOR[platform].process(user, api_token)
+            platform_user_sid = user.platform_to_user_sid[platform]
+            assert \
+                platform_user_sid is not None, \
+                "platform user sid should be set if platform api token is set"
+            await PLATFORM_TO_PROCESSOR[platform].process(
+                PlatformProcessorArgs(
+                    user=user,
+                    api_token=api_token,
+                    platform_user_sid=platform_user_sid))
 
     async def _on_register_platform(self, req: RegisterPlatformReq):
         if req.platform not in PLATFORMS:

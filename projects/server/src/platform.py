@@ -1,11 +1,18 @@
 import httpx
 from typing import TYPE_CHECKING
 
+from pydantic import BaseModel
+
 if TYPE_CHECKING:
     from src.user import UserDoc
 
+class PlatformProcessorArgs(BaseModel):
+    user: "UserDoc"
+    platform_user_sid: str
+    api_token: str
+
 class PlatformProcessor:
-    async def process(self, user: "UserDoc", api_token: str):
+    async def process(self, args: PlatformProcessorArgs):
         raise NotImplementedError
 
 class SteamUrls:
@@ -13,9 +20,11 @@ class SteamUrls:
     GET_OWNED_GAMES = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key={api_token}&steamid={steam_id}&format=json"
 
 class SteamPlatformProcessor(PlatformProcessor):
-    async def process(self, user: "UserDoc", api_token: str):
+    async def process(self, args: PlatformProcessorArgs):
         async with httpx.AsyncClient() as client:
-            res = client.get(SteamUrls.GET_OWNED_GAMES.format())
+            res = client.get(SteamUrls.GET_OWNED_GAMES.format(
+                steam_id=args.platform_user_sid,
+                api_token=args.api_token))
     # res = httpx.request("get", url)
 
     # if res.status_code >= 400:
