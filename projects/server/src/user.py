@@ -89,6 +89,7 @@ class UserSys(Sys):
                     user=user,
                     api_token=api_token,
                     platform_user_sid=platform_user_sid))
+        await self._pub(OkEvt(rsid="").as_res_from_req(req))
 
     async def _on_register_platform(self, req: RegisterPlatformReq):
         if req.platform not in PLATFORMS:
