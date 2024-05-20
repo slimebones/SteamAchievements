@@ -28,3 +28,6 @@ coverage.html:
 run:
 	poetry run python -m src $(host) $(port)
 
+collect_test_data:
+	poetry run python tests/collect_test_data.py
+

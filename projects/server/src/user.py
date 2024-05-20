@@ -10,6 +10,7 @@ from src.platform import PLATFORM_TO_PROCESSOR, PLATFORMS
 class UserUdto(Udto):
     username: str
     global_completion: float
+    registered_platforms: list[str]
     platform_to_user_sid: dict[str, str | None]
     platform_to_api_token: dict[str, str | None]
     game_sids: list[str]
@@ -23,6 +24,8 @@ class UserDoc(Doc):
 
     username: str
     global_completion: float = 0.0
+    # todo: platform_to_completion
+    registered_platforms: list[str] = []
     platform_to_user_sid: dict[str, str | None] = {}
     platform_to_api_token: dict[str, str | None] = {}
     game_sids: list[str] = []
@@ -32,6 +35,7 @@ class UserDoc(Doc):
             sid=self.sid,
             username=self.username,
             global_completion=self.global_completion,
+            registered_platforms=self.registered_platforms,
             platform_to_user_sid=self.platform_to_user_sid,
             platform_to_api_token=self.platform_to_api_token,
             game_sids=self.game_sids)
@@ -58,9 +62,9 @@ class SyncReq(Req):
 class UserSys(Sys):
     async def enable(self):
         await self._sub(
-            RegisterPlatformReq, self._on_register_token)
+            RegisterPlatformReq, self._on_register_platform)
         await self._sub(
-            DeregisterPlatformReq, self._on_deregister_token)
+            DeregisterPlatformReq, self._on_deregister_platform)
         await self._sub(
             SyncReq, self._sync_req)
 
@@ -73,7 +77,7 @@ class UserSys(Sys):
                 raise ValueErr(f"unrecognized platform {platform}")
             await PLATFORM_TO_PROCESSOR[platform].process(user, api_token)
 
-    async def _on_register_token(self, req: RegisterPlatformReq):
+    async def _on_register_platform(self, req: RegisterPlatformReq):
         if req.platform not in PLATFORMS:
             raise ValueErr(f"unrecognized platform {req.platform}")
         UserDoc.get_and_upd(
@@ -84,12 +88,14 @@ class UserSys(Sys):
             }))
         await self._pub(OkEvt(rsid="").as_res_from_req(req))
 
-    async def _on_deregister_token(self, req: DeregisterPlatformReq):
+    async def _on_deregister_platform(self, req: DeregisterPlatformReq):
         if req.platform not in PLATFORMS:
             raise ValueErr(f"unrecognized platform {req.platform}")
         UserDoc.get_and_upd(
             Query.as_search_sid(req.user_sid),
             Query.as_upd(set={
-                f"platform_to_api_token.{req.platform}": None}))
+                f"platform_to_api_token.{req.platform}": None,
+                f"platform_to_user_sid.{req.platform}": None
+            }))
         await self._pub(OkEvt(rsid="").as_res_from_req(req))
 

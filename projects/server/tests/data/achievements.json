@@ -1,0 +1,99 @@
+{
+  "playerstats": {
+    "steamID": "76561198016051984",
+    "gameName": "Lost Potato",
+    "achievements": [
+      {
+        "apiname": "hat_eyebrows",
+        "achieved": 1,
+        "unlocktime": 1715956909
+      },
+      {
+        "apiname": "hat_mouth",
+        "achieved": 1,
+        "unlocktime": 1715957216
+      },
+      {
+        "apiname": "hat_eyepatch",
+        "achieved": 1,
+        "unlocktime": 1715957368
+      },
+      {
+        "apiname": "hat_mustache",
+        "achieved": 0,
+        "unlocktime": 0
+      },
+      {
+        "apiname": "hat_mushroom",
+        "achieved": 0,
+        "unlocktime": 0
+      },
+      {
+        "apiname": "hat_fetus",
+        "achieved": 0,
+        "unlocktime": 0
+      },
+      {
+        "apiname": "hat_helmet",
+        "achieved": 0,
+        "unlocktime": 0
+      },
+      {
+        "apiname": "hat_neutral",
+        "achieved": 1,
+        "unlocktime": 1715957368
+      },
+      {
+        "apiname": "hat_basic",
+        "achieved": 1,
+        "unlocktime": 1715957368
+      },
+      {
+        "apiname": "hat_ranged",
+        "achieved": 1,
+        "unlocktime": 1715957368
+      },
+      {
+        "apiname": "hat_poop",
+        "achieved": 0,
+        "unlocktime": 0
+      },
+      {
+        "apiname": "hat_laser",
+        "achieved": 0,
+        "unlocktime": 0
+      },
+      {
+        "apiname": "hat_tank",
+        "achieved": 0,
+        "unlocktime": 0
+      },
+      {
+        "apiname": "hat_torch",
+        "achieved": 0,
+        "unlocktime": 0
+      },
+      {
+        "apiname": "full_run",
+        "achieved": 0,
+        "unlocktime": 0
+      },
+      {
+        "apiname": "speedrun",
+        "achieved": 0,
+        "unlocktime": 0
+      },
+      {
+        "apiname": "long_run",
+        "achieved": 0,
+        "unlocktime": 0
+      },
+      {
+        "apiname": "no_hit",
+        "achieved": 0,
+        "unlocktime": 0
+      }
+    ],
+    "success": true
+  }
+}
