@@ -1,11 +1,16 @@
-from orwynn.mongo import Doc, DocField, Udto, OkEvt
+from orwynn.mongo import Doc, DocField, OkEvt, Udto
 from orwynn.sys import Sys
 from pykit.err import ValueErr
+from pykit.fcode import code
 from pykit.query import Query
 from rxcat import Req
-from pykit.fcode import code
 
-from src.platform import PLATFORM_TO_PROCESSOR, PLATFORMS, PlatformProcessorArgs
+from src.platform import (
+    PLATFORM_TO_PROCESSOR,
+    PLATFORMS,
+    PlatformProcessorArgs,
+)
+
 
 class UserUdto(Udto):
     username: str

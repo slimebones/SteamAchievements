@@ -2,12 +2,12 @@
 Ref: https://developer.valvesoftware.com/wiki/Steam_Web_API#GetUserStatsForGame_.28v0002.29
 """
 import json
+import sys
 from pathlib import Path
-import httpx
-import dotenv
-from pykit.env import EnvUtils
-from pprint import pprint
 
+import dotenv
+import httpx
+from pykit.env import EnvUtils
 from pykit.log import log
 
 from src.platform import SteamUrls
@@ -19,7 +19,7 @@ def _req_get_json_onetime(url: str) -> dict:
     res = httpx.request("get", url)
     if res.status_code >= 400:
         log.err(f"err during http req: {res.text}")
-        exit(1)
+        sys.exit(1)
     return res.json()
 
 def main():
@@ -27,7 +27,7 @@ def main():
     GAMES_OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     dotenv.load_dotenv()
-    api_token = EnvUtils.get("API_TOKEN") 
+    api_token = EnvUtils.get("API_TOKEN")
     steam_id = EnvUtils.get("STEAM_ID")
     app_id="1365010"
 

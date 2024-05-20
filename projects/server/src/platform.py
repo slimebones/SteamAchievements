@@ -1,11 +1,11 @@
-import httpx
 from typing import TYPE_CHECKING
-from orwynn.mongo import Query
 
+import httpx
+from orwynn.mongo import Query
 from pydantic import BaseModel
 from pykit.log import log
-from src.achievement import AchievementDoc
 
+from src.achievement import AchievementDoc
 from src.game import GameDoc
 
 if TYPE_CHECKING:
@@ -75,7 +75,7 @@ class SteamPlatformProcessor(PlatformProcessor):
                 app_id=game.key))
             if res.status_code >= 400:
                 log.err(
-                    f"err occured during http req to get achievements for game"
+                    "err occured during http req to get achievements for game"
                     + f"{game.key}: {res.text}"
                     " => abort further processing of steam platform")
                 return None
