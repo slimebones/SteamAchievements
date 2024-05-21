@@ -36,11 +36,19 @@
         (ngSubmit)="onSubmitPlatform()">
       <div class="flex flex-col gap-4">
         <label for="">
+          Platform Name
+        </label>
+        <ngx-kit-mat-input
+          class="text-c10-fg"
+          formControlName="platform"
+        />
+
+        <label for="">
           Platform User ID
         </label>
         <ngx-kit-mat-input
           class="text-c10-fg"
-          formControlName="platform_user_sid"
+          formControlName="platformUserSid"
         />
 
         <label for="">
@@ -57,5 +65,11 @@
         register platform
       </ngx-kit-button>
     </form>
+
+    <ngx-kit-button
+        (clickFunc)="sync()"
+        [extraCssClasses]="['bg-c10-bg', 'text-black', 'p-2', 'rounded']">
+      >> Sync <<
+    </ngx-kit-button>
   </div>
 </div>

@@ -27,7 +27,8 @@ export class CfgComponent implements OnInit
       username: new FormControl("")
     });
     this.platformForm = new FormGroup({
-      platform_user_sid: new FormControl(""),
+      platform: new FormControl(""),
+      platformUserSid: new FormControl(""),
       token: new FormControl("")
     });
   }
@@ -39,5 +40,15 @@ export class CfgComponent implements OnInit
 
   public onSubmitPlatform()
   {
+    this.userSv.registerPlatform(
+      this.platformForm.controls["platform"].value,
+      this.platformForm.controls["platformUserSid"].value,
+      this.platformForm.controls["token"].value
+    );
+  }
+
+  public sync()
+  {
+    this.userSv.sync();
   }
 }

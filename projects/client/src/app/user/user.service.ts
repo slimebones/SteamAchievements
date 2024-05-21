@@ -4,7 +4,7 @@ import {
   GetDocsReq,
   GotDocUdtoEvt, StorageService} from "@almazrpe/ngx-kit";
 import { Injectable } from "@angular/core";
-import { Observable, map, of, switchMap } from "rxjs";
+import { Observable, map, of, switchMap, take } from "rxjs";
 import {
   RegisterOrLoginUserReq,
   RegisterPlatformReq, SyncReq, UserUdto } from "./models";
@@ -61,7 +61,8 @@ export class UserService
           token: token
         }));
       }),
-    );
+      take(1)
+    ).subscribe();
   }
 
   public setUser(username: string)
@@ -77,19 +78,20 @@ export class UserService
       .subscribe();
   }
 
-  public sync$(): Observable<void>
+  public sync()
   {
     return this.currentUserSid$.pipe(
-      switchMap(userSid =>
-      {
-        if (userSid === null)
+        switchMap(userSid =>
         {
-          throw new Error("unset user sid");
-        }
-        return ClientBus
-          .ie
-          .pub$(new SyncReq({user_sid: userSid}))
-          .pipe(map(_ => {}));
-      }));
+          if (userSid === null)
+          {
+            throw new Error("unset user sid");
+          }
+          return ClientBus
+            .ie
+            .pub$(new SyncReq({user_sid: userSid}))
+            .pipe(map(_ => {}));
+        }))
+      .subscribe();
   }
 }
