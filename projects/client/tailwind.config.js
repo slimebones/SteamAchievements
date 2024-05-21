@@ -17,8 +17,8 @@ module.exports = {
         "c30-bg": "#31363F",
         "c30-fg": "#EEEEEE",
 
-        "c10-fg": "#76ABAE",
         "c10-bg": "#EEEEEE",
+        "c10-fg": "#76ABAE",
 
         "c10-bg-active": "#7fabad",
         "c10-fg-active": "#FFFFFF",

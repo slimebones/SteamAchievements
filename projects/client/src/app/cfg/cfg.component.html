@@ -1,4 +1,61 @@
 <div>
-  <ngx-kit-mat-input
-    (clickFunc)="userSv.setUser"/>
+  <form
+      class="flex flex-row gap-4 p-10 items-center"
+      [formGroup]="usernameForm"
+      (ngSubmit)="onSubmitUsername()">
+    <div>
+      Username:
+    </div>
+    <ngx-kit-mat-input
+      class="text-c10-fg"
+      formControlName="username"
+    />
+    <ngx-kit-button
+        type="submit"
+        class="ml-4"
+        [extraCssClasses]="['bg-c10-bg', 'text-black', 'p-2', 'rounded']">
+      submit
+    </ngx-kit-button>
+  </form>
+
+  <div
+      class="flex flex-col p-10 mt-4"
+      *ngIf="user$ | async as user">
+    <div class="flex flex-col gap-4">
+      <div>
+        Username: {{user.username}}
+      </div>
+      <div>
+        Registered Platforms: {{user.registered_platforms | json}}
+      </div>
+    </div>
+
+    <form
+        class="flex flex-col gap-4 p-10"
+        [formGroup]="platformForm"
+        (ngSubmit)="onSubmitPlatform()">
+      <div class="flex flex-col gap-4">
+        <label for="">
+          Platform User ID
+        </label>
+        <ngx-kit-mat-input
+          class="text-c10-fg"
+          formControlName="platform_user_sid"
+        />
+
+        <label for="">
+          Platform API Token
+        </label>
+        <ngx-kit-mat-input
+          class="text-c10-fg"
+          formControlName="token"
+        />
+      </div>
+      <ngx-kit-button
+          type="submit"
+          [extraCssClasses]="['bg-c10-bg', 'text-black', 'p-2', 'rounded']">
+        register platform
+      </ngx-kit-button>
+    </form>
+  </div>
 </div>

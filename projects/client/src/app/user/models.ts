@@ -28,6 +28,18 @@ export class RegisterPlatformReq extends Req
   }
 }
 
+@code("register_or_login_user_req")
+export class RegisterOrLoginUserReq extends Req
+{
+  public username: string;
+
+  public constructor(args: any)
+  {
+    super(args);
+    this.username = args.username;
+  }
+}
+
 @code("deregister_platform_req")
 export class DeregisterPlatformReq extends Req
 {

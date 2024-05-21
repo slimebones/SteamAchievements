@@ -13,6 +13,7 @@ import {
 import { Subscription } from "rxjs";
 import { ActivatedRoute } from "@angular/router";
 import { environment } from "src/environments/environment";
+import { UserService } from "./user/user.service";
 
 @Component({
   selector: "app-root",
@@ -22,15 +23,14 @@ import { environment } from "src/environments/environment";
 export class AppComponent implements OnInit, OnDestroy
 {
   public title = "client";
-  private readonly UnselectedViewCssSelectors: string[] = ["hover:underline"];
-  private readonly SelectedViewCssSelectors: string[] = ["underline"];
   private subs: Subscription[] = [];
 
   public constructor(
     private alertSv: AlertService,
     private connSv: ConnService,
     private route: ActivatedRoute,
-    private storageSv: StorageService
+    private storageSv: StorageService,
+    private userSv: UserService
   )
   {
   }
@@ -48,7 +48,6 @@ export class AppComponent implements OnInit, OnDestroy
       "local",
       undefined,
       environment.serverHost + ":" + environment.serverPort);
-    this.storageSv.getItem("local", "opened_view_type", "tpi");
 
     this.subs.push(this.connSv.serverHostPort$.subscribe({
       next: url =>
@@ -59,6 +58,7 @@ export class AppComponent implements OnInit, OnDestroy
       }
     }));
     ClientBus.ie.init(this.alertSv, this.connSv);
+    this.userSv.init();
   }
 
   public ngOnDestroy(): void

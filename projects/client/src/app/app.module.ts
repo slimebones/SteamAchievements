@@ -9,6 +9,7 @@ import { GameComponent } from "./game/game.component";
 import { AchievementComponent } from "./achievement/achievement.component";
 import { UserComponent } from "./user/user.component";
 import { CfgComponent } from "./cfg/cfg.component";
+import { ReactiveFormsModule } from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { CfgComponent } from "./cfg/cfg.component";
   imports: [
     BrowserModule,
     AppRoutingModule,
-    NgxKitModule
+    NgxKitModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
