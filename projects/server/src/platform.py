@@ -56,8 +56,7 @@ class SteamPlatformProcessor(PlatformProcessor):
                 achievements_res = await self._try_create_or_upd_achievements(
                     game, args)
                 if not achievements_res:
-                    return
-                game, achievements = achievements_res
+                    continue
 
     async def _try_create_or_upd_achievements(
         self,
@@ -65,15 +64,14 @@ class SteamPlatformProcessor(PlatformProcessor):
         args: PlatformProcessorArgs
     ) -> tuple[GameDoc, list[AchievementDoc]] | None:
         async with httpx.AsyncClient() as client:
-            res = await client.get(SteamUrls.GET_PLAYER_ACHIEVEMENTS.format(
-                steam_id=args.platform_user_sid,
-                api_token=args.api_token,
-                app_id=game.key))
+            res = await client.get(
+                SteamUrls.GET_PLAYER_ACHIEVEMENTS.format(
+                    steam_id=args.platform_user_sid,
+                    api_token=args.api_token,
+                    app_id=game.key),
+                timeout=60)
             if res.status_code >= 400:
-                log.err(
-                    "err occured during http req to get achievements for game"
-                    + f"{game.key}: {res.text}"
-                    " => abort further processing of steam platform")
+                # if cannot get achievements for an app, just skip
                 return None
             data = res.json()["playerstats"]
 
