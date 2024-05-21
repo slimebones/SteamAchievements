@@ -1,1 +1,4 @@
-<p>games works!</p>
+<div
+    *ngIf="games$ | async as games">
+  {{games | json}}
+</div>
