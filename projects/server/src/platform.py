@@ -100,7 +100,7 @@ class SteamPlatformProcessor(PlatformProcessor):
                     assert \
                         achievement.sid in game.achievement_sids, \
                         f"already created achievement {achievement.key}" \
-                                f"should be part of game {game.key}"
+                                f" should be part of game {game.key}"
                     achievement = achievement.upd(Query.as_upd(set={
                         "name": name,
                         "completion_time": completion_time
