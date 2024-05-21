@@ -1,12 +1,14 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { CfgComponent } from './cfg.component';
+import { CfgComponent } from "./cfg.component";
 
-describe('CfgComponent', () => {
+describe("CfgComponent", () => 
+{
   let component: CfgComponent;
   let fixture: ComponentFixture<CfgComponent>;
 
-  beforeEach(async () => {
+  beforeEach(async () => 
+{
     await TestBed.configureTestingModule({
       declarations: [ CfgComponent ]
     })
@@ -17,7 +19,8 @@ describe('CfgComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => 
+{
     expect(component).toBeTruthy();
   });
 });

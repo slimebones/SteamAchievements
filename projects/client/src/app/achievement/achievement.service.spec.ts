@@ -1,16 +1,19 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from "@angular/core/testing";
 
-import { AchievementService } from './achievement.service';
+import { AchievementService } from "./achievement.service";
 
-describe('AchievementService', () => {
+describe("AchievementService", () => 
+{
   let service: AchievementService;
 
-  beforeEach(() => {
+  beforeEach(() => 
+{
     TestBed.configureTestingModule({});
     service = TestBed.inject(AchievementService);
   });
 
-  it('should be created', () => {
+  it("should be created", () => 
+{
     expect(service).toBeTruthy();
   });
 });

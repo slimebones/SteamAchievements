@@ -1,12 +1,14 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { AchievementComponent } from './achievement.component';
+import { AchievementComponent } from "./achievement.component";
 
-describe('AchievementComponent', () => {
+describe("AchievementComponent", () => 
+{
   let component: AchievementComponent;
   let fixture: ComponentFixture<AchievementComponent>;
 
-  beforeEach(async () => {
+  beforeEach(async () => 
+{
     await TestBed.configureTestingModule({
       declarations: [ AchievementComponent ]
     })
@@ -17,7 +19,8 @@ describe('AchievementComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => 
+{
     expect(component).toBeTruthy();
   });
 });
