@@ -18,7 +18,7 @@ class AchievementUdto(Udto):
     name: str
     icon_url: str | None
     rarity: float | None
-    completion_timestamp: float | None
+    completion_time: float | None
 
 class AchievementDoc(Doc):
     COLLECTION_NAMING = "snake_case"
@@ -27,7 +27,7 @@ class AchievementDoc(Doc):
     name: str
     rarity: float | None = None
     icon_url: str | None = None
-    completion_timestamp: float | None = None
+    completion_time: float | None = None
 
     def to_udto(self) -> AchievementUdto:
         return AchievementUdto(
@@ -36,7 +36,7 @@ class AchievementDoc(Doc):
             name=self.name,
             icon_url=self.icon_url,
             rarity=self.rarity,
-            completion_timestamp=self.completion_timestamp)
+            completion_time=self.completion_time)
 
 class FocusDomainSys(Sys):
     CommonSubMsgFilters = [

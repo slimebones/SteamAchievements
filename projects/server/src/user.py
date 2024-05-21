@@ -1,4 +1,11 @@
-from orwynn.mongo import Doc, DocField, OkEvt, Udto
+from orwynn.mongo import (
+    Doc,
+    DocField,
+    GetDocsReq,
+    OkEvt,
+    Udto,
+    filter_collection_factory,
+)
 from orwynn.sys import Sys
 from pykit.err import ValueErr
 from pykit.fcode import code
@@ -64,7 +71,15 @@ class SyncReq(Req):
     """
     user_sid: str
 
+@code("register_or_login_user_req")
+class RegisterOrLoginUserReq(Req):
+    username: str
+
 class UserSys(Sys):
+    CommonSubMsgFilters = [
+        filter_collection_factory(UserDoc.get_collection())
+    ]
+
     async def enable(self):
         await self._sub(
             RegisterPlatformReq, self._on_register_platform)
@@ -72,6 +87,18 @@ class UserSys(Sys):
             DeregisterPlatformReq, self._on_deregister_platform)
         await self._sub(
             SyncReq, self._sync_req)
+        await self._sub(RegisterOrLoginUserReq, self._on_register_or_login)
+        await self._sub(GetDocsReq, self._on_get_docs)
+
+    async def _on_get_docs(self, req: GetDocsReq):
+        docs = UserDoc.get_many(req.searchQuery)
+        await self._pub(UserDoc.to_got_doc_udtos_evt(req, docs))
+
+    async def _on_register_or_login(self, req: RegisterOrLoginUserReq):
+        user = UserDoc.try_get(Query({"username": req.username}))
+        if user is None:
+            user = UserDoc(username=req.username).create()
+        await self._pub(user.to_got_doc_udto_evt(req))
 
     async def _sync_req(self, req: SyncReq):
         user = UserDoc.get(Query.as_search_sid(req.user_sid))
