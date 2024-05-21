@@ -86,7 +86,7 @@ class UserSys(Sys):
         await self._sub(
             DeregisterPlatformReq, self._on_deregister_platform)
         await self._sub(
-            SyncReq, self._sync_req)
+            SyncReq, self._on_sync_req)
         await self._sub(RegisterOrLoginUserReq, self._on_register_or_login)
         await self._sub(GetDocsReq, self._on_get_docs)
 
@@ -100,7 +100,7 @@ class UserSys(Sys):
             user = UserDoc(username=req.username).create()
         await self._pub(user.to_got_doc_udto_evt(req))
 
-    async def _sync_req(self, req: SyncReq):
+    async def _on_sync_req(self, req: SyncReq):
         user = UserDoc.get(Query.as_search_sid(req.user_sid))
         for platform, api_token in user.platform_to_api_token.items():
             if not api_token:
@@ -113,7 +113,6 @@ class UserSys(Sys):
                 "platform user sid should be set if platform api token is set"
             await PLATFORM_TO_PROCESSOR[platform].process(
                 PlatformProcessorArgs(
-                    user=user,
                     api_token=api_token,
                     platform_user_sid=platform_user_sid))
         await self._pub(OkEvt(rsid="").as_res_from_req(req))
@@ -123,10 +122,15 @@ class UserSys(Sys):
             raise ValueErr(f"unrecognized platform {req.platform}")
         UserDoc.get_and_upd(
             Query.as_search_sid(req.user_sid),
-            Query.as_upd(set={
-                f"platform_to_api_token.{req.platform}": req.token,
-                f"platform_to_user_sid.{req.platform}": req.platform_user_sid
-            }))
+            Query.as_upd(
+                set={
+                    f"platform_to_api_token.{req.platform}": req.token,
+                    f"platform_to_user_sid.{req.platform}":
+                        req.platform_user_sid
+                },
+                push={
+                    "registered_platforms": req.platform
+                }))
         await self._pub(OkEvt(rsid="").as_res_from_req(req))
 
     async def _on_deregister_platform(self, req: DeregisterPlatformReq):
@@ -134,9 +138,13 @@ class UserSys(Sys):
             raise ValueErr(f"unrecognized platform {req.platform}")
         UserDoc.get_and_upd(
             Query.as_search_sid(req.user_sid),
-            Query.as_upd(set={
-                f"platform_to_api_token.{req.platform}": None,
-                f"platform_to_user_sid.{req.platform}": None
-            }))
+            Query.as_upd(
+                set={
+                    f"platform_to_api_token.{req.platform}": None,
+                    f"platform_to_user_sid.{req.platform}": None
+                },
+                pull={
+                    "registered_platforms": req.platform
+                }))
         await self._pub(OkEvt(rsid="").as_res_from_req(req))
 

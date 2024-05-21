@@ -1,4 +1,3 @@
-from typing import TYPE_CHECKING
 
 import httpx
 from orwynn.mongo import Query
@@ -8,11 +7,8 @@ from pykit.log import log
 from src.achievement import AchievementDoc
 from src.game import GameDoc
 
-if TYPE_CHECKING:
-    from src.user import UserDoc
 
 class PlatformProcessorArgs(BaseModel):
-    user: "UserDoc"
     platform_user_sid: str
     api_token: str
 
