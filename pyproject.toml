@@ -4,17 +4,16 @@ version = "0.1.0"
 description = ""
 authors = ["ryzhovalex <thed4rkof@gmail.com>"]
 readme = "README.md"
-packages = [
-    { include = "src" }
-]
 classifiers = [
     "Private :: Do Not Upload"
 ]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 bottle = "^0.13.2"
 pypika = "^0.48.9"
+pydantic = "^2.10.2"
+httpx = "^0.28.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.15"
