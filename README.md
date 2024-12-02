@@ -1,3 +1,2 @@
 # Achievements
-
-Tracks video game achievements.
+Tracks steam achievements.
