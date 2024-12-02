@@ -11,6 +11,13 @@ GET_PLAYER_SUMMARIES = "http://api.steampowered.com/ISteamUser/GetPlayerSummarie
 
 steam_id = "76561198016051984"
 
+def _calculate_average_completion(steam_id: str) -> float:
+    """
+    Collect all achievements for a steam id, calculate completion per game,
+    then arithmetic average for all owned games.
+    """
+
+
 def main():
     api_key = os.getenv("STEAM_API_KEY", None)
     if api_key is None:
