@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import httpx
@@ -16,8 +17,10 @@ GET_SCHEMA_FOR_GAME = "https://api.steampowered.com/ISteamUserStats/GetSchemaFor
 
 API_KEY = ""
 
-def _get_owned_game_ids(steam_id: str) -> set[str]:
-    response = httpx.get(
+async def _get_owned_game_ids(
+    steam_id: str, client: httpx.AsyncClient
+) -> set[str]:
+    response = await client.get(
         GET_OWNED_GAMES.format(steam_id=steam_id, api_key=API_KEY)
     )
     data = response.json()
@@ -27,10 +30,10 @@ def _get_owned_game_ids(steam_id: str) -> set[str]:
         game_ids.add(game["appid"])
     return game_ids
 
-def _get_player_achievements(
-        steam_id: str, game_id: str
-    ) -> Result[PlayerGameAchievements]:
-    response = httpx.get(
+async def _get_player_achievements(
+    steam_id: str, game_id: str, client: httpx.AsyncClient
+) -> Result[PlayerGameAchievements]:
+    response = await client.get(
         GET_PLAYER_ACHIEVEMENTS.format(
             steam_id=steam_id, api_key=API_KEY, app_id=game_id
         )
@@ -61,34 +64,38 @@ def _get_player_achievements(
     )
     return game_achievements
 
-def _calculate_average_completion(steam_id: str) -> float:
+async def _calculate_average_completion(steam_id: str) -> float:
     """
     Collect all achievements for a steam id, calculate completion per game,
     then arithmetic average for all owned games.
     """
-    game_ids = _get_owned_game_ids(steam_id)
-    game_total_len = len(game_ids)
-    print(f"Got {len(game_ids)} owned games.")
-    completions: list[float] = []
-    i = 0
-    for game_id in game_ids:
-        i += 1
-        game_achievements = _get_player_achievements(steam_id, game_id)
-        if is_error(game_achievements):
-            continue
-        completed_count = 0
-        for achievement in game_achievements.achievements:
-            if achievement.is_achieved:
-                completed_count += 1
-        completions.append(
-            completed_count / len(game_achievements.achievements)
-        )
-        print(
-            f"[{i}/{game_total_len}] Got {len(game_achievements.achievements)}"
-            f" achievements for a game `{game_achievements.game_name}`"
-            f" (Completion {game_achievements.completion*100:.1f}%)."
-        )
-    return sum(completions) / len(completions)
+    async with httpx.AsyncClient(timeout=60) as client:
+        game_ids = await _get_owned_game_ids(steam_id, client)
+        game_total_len = len(game_ids)
+        print(f"Got {len(game_ids)} owned games.")
+        completions: list[float] = []
+        i = 0
+        tasks = [asyncio.create_task(
+            _get_player_achievements(steam_id, game_id, client)
+        ) for game_id in game_ids]
+        achievement_gathering = await asyncio.gather(*tasks)
+        for game_achievements in achievement_gathering:
+            i += 1
+            if is_error(game_achievements):
+                continue
+            completed_count = 0
+            for achievement in game_achievements.achievements:
+                if achievement.is_achieved:
+                    completed_count += 1
+            completions.append(
+                completed_count / len(game_achievements.achievements)
+            )
+            print(
+                f"[{i}/{game_total_len}] Got {len(game_achievements.achievements)}"
+                f" achievements for a game `{game_achievements.game_name}`"
+                f" (Completion {game_achievements.completion*100:.1f}%)."
+            )
+        return sum(completions) / len(completions)
 
 def _get_game_schema(game_id: str):
     response = httpx.get(
@@ -96,16 +103,17 @@ def _get_game_schema(game_id: str):
     )
     json.dump(response.json(), open("examples/game_schema.json", "w"))
 
-def main():
+async def main():
     global API_KEY
     API_KEY = os.getenv("STEAM_API_KEY", None)
     if API_KEY is None:
         print("Define STEAM_API_KEY.")
         exit(1)
 
-    _get_game_schema("220")
-    # steam_id = "76561198016051984"
-    # print(_calculate_average_completion(steam_id))
+    # _get_game_schema("220")
+    steam_id = "76561198016051984"
+    completion = await _calculate_average_completion(steam_id)
+    print(completion)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
