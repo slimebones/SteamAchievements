@@ -48,14 +48,27 @@ async def _get_owned_game_ids(
         game_ids.add(game["appid"])
     return game_ids
 
+MAX_GET_ATTEMPTS = 3
+
 async def _get_player_achievements(
     steam_id: str, game_id: str, client: httpx.AsyncClient
 ) -> Result[PlayerGameAchievements]:
-    response = await client.get(
-        GET_PLAYER_ACHIEVEMENTS.format(
-            steam_id=steam_id, api_key=API_KEY, app_id=game_id
-        )
-    )
+    attempts = 0
+    while attempts < MAX_GET_ATTEMPTS:
+        attempts += 1
+        try:
+            response = await client.get(
+                GET_PLAYER_ACHIEVEMENTS.format(
+                    steam_id=steam_id, api_key=API_KEY, app_id=game_id
+                )
+            )
+            break
+        except Exception as error:
+            print(f"[Error 1] Failed achievement fetching for game #{game_id}. Retry in 5 seconds ({attempts}/{MAX_GET_ATTEMPTS}). Error: {error}")
+            continue
+    else:
+        return Exception(f"Out of attempts for game #{game_id}")
+
     if response.status_code >= 400:
         return Exception()
     data = response.json()["playerstats"]
@@ -97,6 +110,7 @@ async def _calculate_average_completion(steam_id: str) -> float:
             _get_player_achievements(steam_id, game_id, client)
         ) for game_id in game_ids]
         achievement_gathering = await asyncio.gather(*tasks)
+        assert len(achievement_gathering) == len(game_ids)
         for game_achievements in achievement_gathering:
             i += 1
             if is_error(game_achievements):
