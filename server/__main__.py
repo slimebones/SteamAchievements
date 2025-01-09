@@ -49,10 +49,17 @@ async def _get_owned_game_ids(
     return game_ids
 
 MAX_GET_ATTEMPTS = 3
+MAX_CONNECTIONS = 5
+_current_connections = 0
 
 async def _get_player_achievements(
     steam_id: str, game_id: str, client: httpx.AsyncClient
 ) -> Result[PlayerGameAchievements]:
+    global _current_connections
+    while _current_connections >= MAX_CONNECTIONS:
+        await asyncio.sleep(2.5)
+    _current_connections += 1
+
     attempts = 0
     while attempts < MAX_GET_ATTEMPTS:
         attempts += 1
@@ -67,32 +74,38 @@ async def _get_player_achievements(
             print(f"[Error 1] Failed achievement fetching for game #{game_id}. Retry in 5 seconds ({attempts}/{MAX_GET_ATTEMPTS}). Error: {error}")
             continue
     else:
+        _current_connections -= 1
         return Exception(f"Out of attempts for game #{game_id}")
 
-    if response.status_code >= 400:
-        return Exception()
-    data = response.json()["playerstats"]
-    achievements = []
-    raw_achievements = data.get("achievements")
-    if not raw_achievements:
-        return Exception()
-    achieved_count = 0
-    for raw_achievement in raw_achievements:
-        achievement = Achievement(
-            key=raw_achievement["apiname"],
-            is_achieved=raw_achievement["achieved"] == 1,
-            unlock_time=raw_achievement["unlocktime"] * 1000,
+    try:
+        if response.status_code >= 400:
+            _current_connections -= 1
+            return Exception()
+        data = response.json()["playerstats"]
+        achievements = []
+        raw_achievements = data.get("achievements")
+        if not raw_achievements:
+            _current_connections -= 1
+            return Exception()
+        achieved_count = 0
+        for raw_achievement in raw_achievements:
+            achievement = Achievement(
+                key=raw_achievement["apiname"],
+                is_achieved=raw_achievement["achieved"] == 1,
+                unlock_time=raw_achievement["unlocktime"] * 1000,
+            )
+            if achievement.is_achieved:
+                achieved_count += 1
+            achievements.append(achievement)
+        completion = achieved_count / len(achievements)
+        game_achievements = PlayerGameAchievements(
+            steam_id=data["steamID"],
+            game_name=data["gameName"],
+            achievements=achievements,
+            completion=completion,
         )
-        if achievement.is_achieved:
-            achieved_count += 1
-        achievements.append(achievement)
-    completion = achieved_count / len(achievements)
-    game_achievements = PlayerGameAchievements(
-        steam_id=data["steamID"],
-        game_name=data["gameName"],
-        achievements=achievements,
-        completion=completion,
-    )
+    finally:
+        _current_connections -= 1
     return game_achievements
 
 async def _calculate_average_completion(steam_id: str) -> float:
