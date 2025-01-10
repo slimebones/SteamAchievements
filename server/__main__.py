@@ -27,7 +27,7 @@ async def log(message: Any):
     global _log_file
     if _log_file is None:
         _log_file = await aiofiles.open(
-            Path(Path.cwd(), "Var/App.log"),
+            Path(Path.cwd(), "var/app.log"),
             mode="a+"
         )
     message = str(message)
